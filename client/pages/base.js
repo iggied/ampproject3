@@ -9,6 +9,10 @@ module.exports = View.extend({
 
     extraProperties: 'allow',
 
+    session: {
+       errorsBag:  ['object',  false, function(){return {}}]
+    }, 
+
     initialize: function(opts) {
        console.log('base init');
     },
@@ -30,7 +34,8 @@ module.exports = View.extend({
    validate: function(e, opts) {
       var oldVal = this[opts.propName];
       var newVal = e[opts.propName];
-      return this.validateInput(opts.propName, oldVal, newVal);
+      this.validateInput(opts.propName, newVal, oldVal );
+      return false;		// false means no errors
    },
 
    updateErrorBag: function( propName, type, message, valid ) {

@@ -41,8 +41,15 @@ var people = [
 var id = 7;
 
 function get(id) {
+    console.log('id='+id);
     return _.findWhere(people, {id: parseInt(id + '', 10)});
-}
+};
+
+function getByName(fname, lname) {
+    console.log('fname='+fname);
+    console.log('lname='+lname);
+    return _.findWhere(people, {firstName: fname, lastName: lname});
+};
 
 exports.register = function (server, options, next) {
     server.route({
@@ -69,7 +76,18 @@ exports.register = function (server, options, next) {
         path: '/api/people/{id}',
         handler: function (request, reply) {
             var found = get(request.params.id);
+            console.log(found);
             reply(found).code(found ? 200 : 404);
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/api/people/{fname}/{lname}',
+        handler: function (request, reply) {
+           var found = getByName(request.params.fname, request.params.lname);
+           console.log(found);
+           reply(found).code(found ? 200 : 404);
         }
     });
 

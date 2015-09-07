@@ -53,7 +53,7 @@
 
     // pages/login.jade compiled template
     templatizer["pages"]["login"] = function tmpl_pages_login() {
-        return '<section class="page loginsection"><h1>Login </h1><form><p><label>User name</label><input type="text" data-hook="userId" tabindex="1" autofocus="autofocus"/><span data-hook="error-user-id"></span></p><p><label>Password</label><input type="password" data-hook="password" tabindex="2"/><span data-hook="password-strength"></span><span data-hook="error-password"></span></p><p data-hook="remember-me-area"><label>Remember me</label><input type="checkbox" data-hook="rememberMe" tabindex="3"/></p><p><input type="submit" data-hook="loginbutton" value="Log in" tabindex="4"/></p></form></section>';
+        return '<section class="page loginsection"><h1>Login </h1><form><p><label>User name</label><input type="text" data-hook="userId" tabindex="1" autofocus="autofocus"/><span data-hook="error-user-id"></span></p><p><label>Password</label><input type="password" data-hook="password" tabindex="2"/><span data-hook="password-strength"></span><span data-hook="error-password"></span></p><p data-hook="remember-me-area"><label>Remember me</label><input type="checkbox" data-hook="rememberMe" tabindex="3"/></p><p><input type="submit" data-hook="loginbutton" value="Log in" tabindex="4"/></p><p><span data-hook="model-id"></span></p></form></section>';
     };
 
     // pages/personAdd.jade compiled template

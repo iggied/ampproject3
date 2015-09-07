@@ -1,6 +1,7 @@
 var PageView = require('./base');
 var templates = require('../templates');
 var _ = require('lodash');
+var Person = require('../models/person');
 
 module.exports = PageView.extend({
     pageTitle: 'login',
@@ -14,10 +15,9 @@ module.exports = PageView.extend({
     },
 
     session: {
-       userId:     ['string', false, ''],
-       password:   ['string', false, ''],
-       rememberMe: ['boolean', false, false],
-       errorsBag:  ['object', false, function(){return {}}]
+       userId:     ['string',  false, ''],
+       password:   ['string',  false, ''],
+       rememberMe: ['boolean', false, false]
     },
 
     derived: {
@@ -29,13 +29,14 @@ module.exports = PageView.extend({
     },
 
     bindings: _.extend({}, PageView.prototype.bindings, {
-       'userId':     [{type: 'value', hook: 'userId'}],
-       'password':   [{type: 'value', hook: 'password'}],
-       'rememberMe': [{type: 'booleanAttribute', name: 'checked', hook: 'rememberMe'}],
-       'loginOptions.rememberMeEnabled': [{type: 'toggle', hook: 'remember-me-area'}], 
-       'passwordStrength': [{type: 'text', hook: 'password-strength'}],
-       'errorsBag.userId.errorText': [{type: 'text', hook: 'error-user-id'}],
-       'errorsBag.password.errorText': [{type: 'text', hook: 'error-password'}]
+       'userId':                         [{type: 'value',            hook: 'userId'}],
+       'password':                       [{type: 'value',            hook: 'password'}],
+       'rememberMe':                     [{type: 'booleanAttribute', hook: 'rememberMe', name: 'checked'}],
+       'loginOptions.rememberMeEnabled': [{type: 'toggle',           hook: 'remember-me-area'}], 
+       'passwordStrength':               [{type: 'text',             hook: 'password-strength'}],
+       'errorsBag.userId.errorText':     [{type: 'text',             hook: 'error-user-id'}],
+       'errorsBag.password.errorText':   [{type: 'text',             hook: 'error-password'}],
+       'model.id':                       [{type: 'text',             hook: 'model-id'}]
     }),
 
     events: _.extend({}, PageView.prototype.events, {
@@ -57,14 +58,23 @@ module.exports = PageView.extend({
     handleLogin: function(e) {
        e.preventDefault();
        console.log('State u='+this.userId + ' p=' + this.password +' r='+this.rememberMe);
+       for (propName in this.getAttributes({session: true})) {
+          this.validateInput(propName, this[propName], this[propName]);
+       }
+
+       this.model.id = '';
+       this.model.firstName = this.userId;
+       this.model.lastName = this.password;
+       this.model.fetch();
+
        if (this.rememberMe) 
           document.cookie = 'userid='+this.userId;
        else
           document.cookie = 'userid=;';
     },
 
-   validateInput: function(propName, oldVal, newVal) {
-      console.log('validate old='+oldVal + ' new='+newVal);
+   validateInput: function(propName, newVal, oldVal) {
+      //console.log('validate old='+oldVal + ' new='+newVal);
 
       switch (propName) {
          case 'userId': {
