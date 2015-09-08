@@ -3,7 +3,7 @@ var Router = require('ampersand-router');
 var HomePage = require('./pages/home');
 var loginOptions = require('./config/loginoptions');
 var LoginPage = require('./pages/login');
-var Person = require('./models/person');
+var LoginModel = require('./models/loginmodel');
 
 module.exports = Router.extend({
     routes: {
@@ -20,8 +20,7 @@ module.exports = Router.extend({
     },
     login: function () {
         var page = new LoginPage({
-            loginOptions: loginOptions,
-            model: new Person()
+                      model: new LoginModel( {loginOptions: loginOptions} )
         });
         app.trigger('page', page);
     },

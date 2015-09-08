@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var LoginModel = require('./client/models/loginmodel');
+var loginOptions = require('./client/config/loginoptions');
 
 var people = [
     {
@@ -40,18 +42,49 @@ var people = [
 ];
 var id = 7;
 
-function get(id) {
-    console.log('id='+id);
-    return _.findWhere(people, {id: parseInt(id + '', 10)});
-};
+var users = [
+    {
+        token:    1,
+        userId:   'ignatius',
+        password: 'dmello00'
+    },
+    {   token:    2,
+        userId:   'graceee',
+        password: '00dmello'
+    }
+];
 
-function getByName(fname, lname) {
-    console.log('fname='+fname);
-    console.log('lname='+lname);
-    return _.findWhere(people, {firstName: fname, lastName: lname});
-};
+function getToken(userId, password) {
+    return _.findWhere(users, {userId: userId, password: password});
+}
+
+
+
+function get(id) {
+    return _.findWhere(people, {id: parseInt(id + '', 10)});
+}
 
 exports.register = function (server, options, next) {
+    server.route({
+        method: 'POST',
+        path: '/api/user/checkuser',
+        handler: function (request, reply) {
+            var user = request.payload;
+
+            console.log(request.payload);
+
+            var loginModel = new LoginModel({loginOptions: loginOptions});
+            loginModel.set( user );
+            loginModel.validateModel();
+
+            var found = getToken(user.userId, user.password);
+            loginModel.token = found && found.token;
+
+            //reply(found).code(found ? 200 : 404);
+            reply(loginModel).code(loginModel? 200 : 404);
+        }
+    });
+
     server.route({
         method: 'GET',
         path: '/api/people',
@@ -76,18 +109,7 @@ exports.register = function (server, options, next) {
         path: '/api/people/{id}',
         handler: function (request, reply) {
             var found = get(request.params.id);
-            console.log(found);
             reply(found).code(found ? 200 : 404);
-        }
-    });
-
-    server.route({
-        method: 'GET',
-        path: '/api/people/{fname}/{lname}',
-        handler: function (request, reply) {
-           var found = getByName(request.params.fname, request.params.lname);
-           console.log(found);
-           reply(found).code(found ? 200 : 404);
         }
     });
 
