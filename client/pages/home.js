@@ -1,4 +1,4 @@
-var PageView = require('./base');
+var PageView = require('./baseview');
 var templates = require('../templates');
 
 

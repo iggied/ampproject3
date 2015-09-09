@@ -2,19 +2,21 @@ section.page.loginsection
   h1 Login 
   form
     p
-      label User name
+      label(data-hook='user-id-label')
       input(type='text', data-hook='userId', tabindex='1', autofocus)
       span(data-hook='error-user-id')
     p
-      label Password
+      label(data-hook='password-label')
       input(type='password', data-hook='password', tabindex='2')
       span(data-hook='password-strength')
       span(data-hook='error-password')
     p(data-hook='remember-me-area')
-      label Remember me
+      label(data-hook='rememberme-label') 
       input(type='checkbox', data-hook='rememberMe', tabindex='3')
     p
       input(type='submit', data-hook='loginbutton', value='Log in', tabindex='4') 
     p
       span(data-hook='model-id')
+      span(data-hook='error-model')
+
 

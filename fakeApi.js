@@ -54,35 +54,43 @@ var users = [
     }
 ];
 
-function getToken(userId, password) {
-    return _.findWhere(users, {userId: userId, password: password});
+function get(id) {
+    return _.findWhere(people, {id: parseInt(id + '', 10)});
 }
 
 
-
-function get(id) {
-    return _.findWhere(people, {id: parseInt(id + '', 10)});
+function getUser(userId, password) {
+    return _.findWhere(users, {userId: userId, password: password});
 }
 
 exports.register = function (server, options, next) {
     server.route({
         method: 'POST',
-        path: '/api/user/checkuser',
+        path: '/api/user',
         handler: function (request, reply) {
             var user = request.payload;
 
             console.log(request.payload);
 
-            var loginModel = new LoginModel({loginOptions: loginOptions});
+            //loginOptions.getToken = getToken;   // I WANT TO CALL A FUNCTION DEFINED HERE FROM A MODEL METHOD ??
+
+            var loginModel = new LoginModel({loginOptions: loginOptions, getUser: getUser});
             loginModel.set( user );
-            loginModel.validateModel();
+            var found = loginModel.fetchModel();
+            
+            loginModel.validateModel(users);
 
-            var found = getToken(user.userId, user.password);
-            loginModel.token = found && found.token;
-
-            //reply(found).code(found ? 200 : 404);
             reply(loginModel).code(loginModel? 200 : 404);
         }
+    });
+
+    server.route({
+       method: 'GET',
+       path: '/api/user/{userId}/{password}',
+       handler: function(request, reply) {
+          var found = getUser( request.params.userId, request.params.password );
+          reply(found).code(found ? 200 : 404);
+       }
     });
 
     server.route({
