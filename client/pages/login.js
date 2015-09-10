@@ -23,25 +23,19 @@ module.exports = PageView.extend({
     derived: {
        passwordStrength: {
             deps: ['model.password'],
-            fn: function () { return this.model.loginOptions.enforcePasswordStrength(this.model.password); }
+            fn: function () { return this.model.loginOptions.getPasswordStrength(this.model.password); }
        },
        userIdMessages: {
             deps: ['model.errorsBag.userId'],
-            fn: function() { 
-                   return this.model.errorsBag.userId && this.model.errorsBag.userId.map( function(i) {return i.message} ).join('; '); 
-            }
+            fn: function() { return this.model.getErrMessagesArray('userId').join(', '); }
        },
        passwordMessages: {
             deps: ['model.errorsBag.password'],
-            fn: function() { 
-                   return this.model.errorsBag.password && this.model.errorsBag.password.map( function(i) {return i.message} ).join('; '); 
-            }
+            fn: function() { return this.model.getErrMessagesArray('password').join(', '); }
        },
        modelMessages: {
             deps: ['model.errorsBag.model'],
-            fn: function() { 
-                   return this.model.errorsBag.model && this.model.errorsBag.model.map( function(i) {return i.message} ).join('; '); 
-            }
+            fn: function() { return this.model.getErrMessagesArray('model').join(', '); }
        }
     },
 
@@ -55,11 +49,11 @@ module.exports = PageView.extend({
        'model.userId':     [{type: 'value', hook: 'userId'}],
        'model.password':   [{type: 'value', hook: 'password'}],
        'rememberMe':       [{type: 'booleanAttribute', hook: 'rememberMe', name: 'checked'}],
-       'passwordStrength': [{type: 'text',  hook: 'password-strength'}],
-       'userIdMessages':   [{type: 'text',  hook: 'error-user-id'}],
-       'passwordMessages': [{type: 'text',  hook: 'error-password'}],
-       'model.token':      [{type: 'text',  hook: 'model-id'}],
-       'modelMessages':    [{type: 'text',  hook: 'error-model'}],
+       'passwordStrength': [{type: 'text', hook: 'password-strength'}],
+       'userIdMessages':   [{type: 'text', hook: 'error-user-id'}],
+       'passwordMessages': [{type: 'text', hook: 'error-password'}],
+       'model.token':      [{type: 'text', hook: 'model-id'}],
+       'modelMessages':    [{type: 'text', hook: 'error-model'}],
     }),
 
     events: _.extend({}, PageView.prototype.events, {
@@ -85,6 +79,5 @@ module.exports = PageView.extend({
           else
              document.cookie = 'rememberme=;';
        }
-    }
-
+    },
 });

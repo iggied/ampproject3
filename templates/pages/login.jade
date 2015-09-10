@@ -3,20 +3,25 @@ section.page.loginsection
   form
     p
       label(data-hook='user-id-label')
-      input(type='text', data-hook='userId', tabindex='1', autofocus)
+      input(type='text', data-hook='userId', tabindex=1, autofocus)
       span(data-hook='error-user-id')
+
     p
       label(data-hook='password-label')
-      input(type='password', data-hook='password', tabindex='2')
+      input(type='password', data-hook='password', tabindex=2)
       span(data-hook='password-strength')
       span(data-hook='error-password')
+
     p(data-hook='remember-me-area')
       label(data-hook='rememberme-label') 
-      input(type='checkbox', data-hook='rememberMe', tabindex='3')
+      input(type='checkbox', data-hook='rememberMe', tabindex=3)
+
     p
-      input(type='submit', data-hook='loginbutton', value='Log in', tabindex='4') 
+      input(type='submit', data-hook='loginbutton', value='Log in', tabindex=4) 
+
     p
       span(data-hook='model-id')
       span(data-hook='error-model')
 
-
+  div
+    a(href='register') Register

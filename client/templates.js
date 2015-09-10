@@ -18,7 +18,7 @@
 
     // body.jade compiled template
     templatizer["body"] = function tmpl_body() {
-        return '<body><nav class="navbar navbar-default"><div class="container-fluid"><div class="navbar-header"><a href="/" class="navbar-brand">Basic App</a></div><ul class="nav navbar-nav"><li><a href="/">home</a></li><li><a href="/login">login </a></li><li><a href="/info">more info</a></li></ul></div></nav><div class="container"><main data-hook="page-container"></main><footer class="footer-main"><nav class="nav-footer cf"><div><a href="http://ampersandjs.com/learn" class="nav-item external">Learn</a><a href="http://ampersandjs.com/docs" class="nav-item external">Docs</a><a href="http://tools.ampersandjs.com" class="nav-item external">Modules</a></div><div><a href="https://gitter.im/AmpersandJS/AmpersandJS" class="nav-item external">Chatroom</a><a href="https://trello.com/b/UxylNzHr/ampersand-js-roadmap" class="nav-item external">Roadmap</a><a href="http://ampersandjs.com/contribute" class="nav-item external">Contribute</a></div><div><a href="http://ampersandjs.com/security" class="nav-item external">Security</a><a href="https://github.com/ampersandjs" class="nav-item external">Github</a><a href="https://twitter.com/ampersandjs" class="nav-item external">Twitter</a></div></nav><p>Sponsored by <a href="https://andyet.com">&amp;yet </a><br/>with the help of our <a href="http://ampersandjs.com/contribute">contributors</a></p><a href="http://ampersandjs.com" class="logo logo-ampersand-pink">&amp;</a></footer></div></body>';
+        return '<body><nav class="navbar navbar-default"><div class="container-fluid"><div class="navbar-header"><a href="/" class="navbar-brand">Basic App</a></div><ul class="nav navbar-nav"><li><a href="/">home</a></li><li><a href="/login">login </a></li><li><a href="/register">register </a></li><li><a href="/info">more info</a></li></ul></div></nav><div class="container"><main data-hook="page-container"></main><footer class="footer-main"></footer></div></body>';
     };
 
     // head.jade compiled template
@@ -53,7 +53,7 @@
 
     // pages/login.jade compiled template
     templatizer["pages"]["login"] = function tmpl_pages_login() {
-        return '<section class="page loginsection"><h1>Login </h1><form><p><label data-hook="user-id-label"></label><input type="text" data-hook="userId" tabindex="1" autofocus="autofocus"/><span data-hook="error-user-id"></span></p><p><label data-hook="password-label"></label><input type="password" data-hook="password" tabindex="2"/><span data-hook="password-strength"></span><span data-hook="error-password"></span></p><p data-hook="remember-me-area"><label data-hook="rememberme-label"> </label><input type="checkbox" data-hook="rememberMe" tabindex="3"/></p><p><input type="submit" data-hook="loginbutton" value="Log in" tabindex="4"/></p><p><span data-hook="model-id"></span><span data-hook="error-model"></span></p></form></section>';
+        return '<section class="page loginsection"><h1>Login </h1><form><p><label data-hook="user-id-label"></label><input type="text" data-hook="userId" tabindex="1" autofocus="autofocus"/><span data-hook="error-user-id"></span></p><p><label data-hook="password-label"></label><input type="password" data-hook="password" tabindex="2"/><span data-hook="password-strength"></span><span data-hook="error-password"></span></p><p data-hook="remember-me-area"><label data-hook="rememberme-label"> </label><input type="checkbox" data-hook="rememberMe" tabindex="3"/></p><p><input type="submit" data-hook="loginbutton" value="Log in" tabindex="4"/></p><p><span data-hook="model-id"></span><span data-hook="error-model"></span></p></form><div><a href="register">Register</a></div></section>';
     };
 
     // pages/personAdd.jade compiled template
@@ -69,6 +69,11 @@
     // pages/personView.jade compiled template
     templatizer["pages"]["personView"] = function tmpl_pages_personView() {
         return '<section class="page view-person"><h2 data-hook="name"></h2><img data-hook="avatar" width="80" height="80"/><div class="buttons"><a data-hook="edit" class="btn">Edit</a><button data-hook="delete" class="btn">Delete</button></div></section>';
+    };
+
+    // pages/register.jade compiled template
+    templatizer["pages"]["register"] = function tmpl_pages_register() {
+        return '<section class="page registersection"><h1>Registration</h1><form><p><label data-hook="name-label"></label><input type="text" data-hook="name" tabindex="1" autofocus="autofocus"/><span data-hook="name-error"></span></p><p><label data-hook="gender-label"></label><select data-hook="gender" tabindex="2"></select></p><p><label data-hook="email-label"></label><input type="text" data-hook="email" tabindex="3"/><span data-hook="email-error"></span></p><p><label data-hook="mobile-label"></label><input type="text" data-hook="mobile" tabindex="4"/><span data-hook="mobile-error"></span></p><p><label data-hook="country-label"></label><input type="text" data-hook="country" tabindex="5"/><span data-hook="country-error"></span></p><p><label data-hook="pin-label"></label><input type="text" data-hook="pin" tabindex="6"/><span data-hook="pin-error"></span></p><p><input type="submit" data-hook="registerbutton" value="Register" tabindex="7"/></p><p><span data-hook="model-error"></span></p></form></section>';
     };
 
     return templatizer;
