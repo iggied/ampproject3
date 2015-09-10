@@ -1,0 +1,39 @@
+section.page.registersection
+  h1 Registration
+  form
+    p
+      label(data-hook='name-label')
+      input(type='text', data-hook='name', tabindex=1, autofocus)
+      span(data-hook='name-error')
+
+    p
+      label(data-hook='gender-label')
+      select(data-hook='gender',tabindex=2)
+
+    p
+      label(data-hook='email-label')
+      input(type='text', data-hook='email', tabindex=3)
+      span(data-hook='email-error')
+
+    p
+      label(data-hook='mobile-label')
+      input(type='text', data-hook='mobile', tabindex=4)
+      span(data-hook='mobile-error')
+
+    p
+      label(data-hook='country-label')
+      input(type='text', data-hook='country', tabindex=5)
+      span(data-hook='country-error')
+
+    p
+      label(data-hook='pin-label')
+      input(type='text', data-hook='pin', tabindex=6)
+      span(data-hook='pin-error')
+
+    p
+      input(type='submit', data-hook='registerbutton', value='Register', tabindex=7) 
+
+    p
+      span(data-hook='model-error')
+
+
