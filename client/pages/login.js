@@ -6,6 +6,7 @@
 var PageView = require('./baseview');
 var templates = require('../templates');
 var _ = require('lodash');
+var app = require('ampersand-app');
 
 module.exports = PageView.extend({
     pageTitle: 'login',
@@ -72,12 +73,9 @@ module.exports = PageView.extend({
        this.model.validateModel();   // Validates all model props and updates errorsBag accordingly
 
        if (this.model.isClientModelValid()) {     // Ignore server error messages as server validations will be performed in save
-          this.model.save();
-
-          if (this.rememberMe) 
-             document.cookie = 'rememberme='+this.model.userId;
-          else
-             document.cookie = 'rememberme=;';
-       }
+          this.model.save({}, {success: function(model, response){ app.trigger('login', response) } });
+       };
     },
+
+    
 });

@@ -18,7 +18,7 @@
 
     // body.jade compiled template
     templatizer["body"] = function tmpl_body() {
-        return '<body><nav class="navbar navbar-default"><div class="container-fluid"><div class="navbar-header"><a href="/" class="navbar-brand">Basic App</a></div><ul class="nav navbar-nav"><li><a href="/">home</a></li><li><a href="/login">login </a></li><li><a href="/register">register </a></li><li><a href="/info">more info</a></li></ul></div></nav><div class="container"><main data-hook="page-container"></main><footer class="footer-main"></footer></div></body>';
+        return '<body><nav class="navbar navbar-default"><div class="container-fluid"><div class="navbar-header"><a href="/" class="navbar-brand">Basic App</a></div><ul class="nav navbar-nav"><li><a href="/">home</a></li><li><a href="/login" data-hook="loginlogout">login </a></li><li><a href="/register">register </a></li><li><a href="/info">more info</a></li><li><a href="/user" data-hook="userId"> </a></li></ul></div></nav><div class="container"><main data-hook="page-container"></main><footer class="footer-main"></footer></div></body>';
     };
 
     // head.jade compiled template

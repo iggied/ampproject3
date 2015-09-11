@@ -80,7 +80,7 @@ exports.register = function (server, options, next) {
             
             loginModel.validateModel(users);
 
-            reply(loginModel).code(loginModel? 200 : 404);
+            reply(loginModel).code(loginModel? 200 : 404).state('userid', found.userId);
         }
     });
 

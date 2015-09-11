@@ -37,7 +37,7 @@ module.exports = Model.extend({
    updateErrorBag: function( propName, type, message, valid ) {
       var errorObject = {type: type, message: message};
       var updated;
-      if (!this.errorsBag[propName]) { this.errorsBag[propName]= []; };
+      this.errorsBag[propName] = this.errorsBag[propName] || [];
       if (valid) {
          _.remove(this.errorsBag[propName], function(v) { return v.type === type });
          updated = true;
@@ -56,10 +56,11 @@ module.exports = Model.extend({
       return (this.errorsBag[propName] ? this.errorsBag[propName].map( function(i) {return i.message} ) : []) ;
    },
 
-   isClientModelValid: function() {
+   isModelValid: function(includeFn) {
       var count = 0;
+      includeFn = includeFn || function(){ return true };
       for (prop in this.errorsBag) {
-         count += (prop !== 'model'? this.errorsBag[prop].length : 0) ;
+         count += ( includeFn(prop) ? this.errorsBag[prop].length : 0) ;
       }
       return count === 0;
    }

@@ -45,6 +45,10 @@ module.exports = BaseModel.extend({
       }
    },
 
+   isClientModelValid: function() {
+      return this.isModelValid( function(propName){ return propName !== 'model' } ) ;    // ignoring model errors as it is set only on server in validateModel
+   },
+
    // server only method  // assuming getUser will be set to a function in the calling script 
    fetchModel: function() {     
       var found = this.getUser(this.userId, this.password);  // Function injected while creating instance

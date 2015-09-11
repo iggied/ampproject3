@@ -12,6 +12,7 @@ module.exports = Router.extend({
     routes: {
         '': 'home',
         'login': 'login',
+        'logout': 'logout',
         'register': 'register',
         '(*path)': 'catchAll'
     },
@@ -27,6 +28,10 @@ module.exports = Router.extend({
                       model: new LoginModel( {loginOptions: loginOptions} )
         });
         app.trigger('page', page);
+    },
+    logout: function() {
+        app.trigger('logout');
+        this.redirectTo('login'); 
     },
     register: function () {
         var page = new RegisterPage({

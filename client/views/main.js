@@ -17,10 +17,29 @@ module.exports = View.extend({
     initialize: function () {
         // this marks the correct nav item selected
         this.listenTo(app, 'page', this.handleNewPage);
+        this.listenTo(app, 'login', this.handleLogin);
+        this.listenTo(app, 'logout', this.handleLogout);
     },
     events: {
         'click a[href]': 'handleLinkClick'
     },
+    session: {
+       token:       ['any', false, ''],
+       userId:      ['string', false, ''],
+    },
+
+    derived: {
+       loginlogout: {
+         deps: ['token'],
+         fn: function() { return this.token ? 'logout' : 'login'; }
+       }
+    },
+
+    bindings: {
+       'loginlogout': [{type: 'attribute', name: 'href', hook: 'loginlogout'}, {type: 'text', hook: 'loginlogout'}],
+       'userId':      [{type: 'attribute', name: 'href', hook: 'userId'}, {type: 'text', hook: 'userId'}]
+    },
+
     render: function () {
         // some additional stuff we want to add to the document head
         document.head.appendChild(domify(templates.head()));
@@ -85,5 +104,22 @@ module.exports = View.extend({
                 dom.removeClass(aTag.parentNode, 'active');
             }
         });
-    }
+    },
+
+    handleLogin: function(model) {
+       if (model.token) {
+          //document.cookie = rememberMe ? 'rememberme='+model.userId : 'rememberme=;';
+          this.token = model.token;
+          this.userId = model.userId;
+          app.navigate('');
+       }
+    },
+
+    handleLogout: function() {
+       if (this.token) {
+          this.token = '';
+          this.userId = '';
+       }
+    },
+
 });

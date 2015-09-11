@@ -7,11 +7,13 @@ body
         li
           a(href="/") home
         li
-          a(href="/login") login 
+          a(href="/login", data-hook='loginlogout') login 
         li
           a(href="/register") register 
         li
           a(href="/info") more info
+        li
+          a(href="/user", data-hook='userId') 
   .container
     main(data-hook="page-container")
     footer.footer-main
