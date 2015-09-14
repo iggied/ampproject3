@@ -7,6 +7,10 @@ module.exports = Model.extend({
       errorsBag: ['object', false, function(){return {}}]
    },
 
+   session: {
+      asyncPendingCalls: ['array', false, function(){ return[] }]
+   },
+
    validate: function(e, opts) {        //This method is automatically called while setting the value of props with validate: true & propName 
       var oldVal = this[opts.propName];
       var newVal = e[opts.propName];
@@ -16,7 +20,7 @@ module.exports = Model.extend({
 
    validateModel: function() {
        for (propName in this.getAttributes({props: true})) {
-          this.validateProp(propName, this[propName], this[propName]);
+          this.validateProp(propName, this[propName], this[propName]);	// subclass has to implement this method
        }
    },
 
@@ -33,6 +37,20 @@ module.exports = Model.extend({
          }, this)
       }, this);
    },
+
+   // Called from subclass to iterate over an array of functions which return an array/object of error messages.
+   executeAsyncChecks: function(propName, checksArray, newValue, oldValue) {
+      var sign;
+      _.forEach(checksArray, function(checkFn) {
+         sign = checkFn(newValue, this, propName);
+         this.asyncPendingCalls.push(sign);
+      }, this);
+   },
+
+   asyncCheckResponse: function(inResult) {
+      this.updateErrorBag(inResult.propName, inResult.type, inResult.message, inResult.validity);
+      this.asyncPendingCalls.pop();	//THIS SHOULD NOT BE POP, INSTEAD FIND AND DELETE THE ELEMENT
+   }, 
 
    updateErrorBag: function( propName, type, message, valid ) {
       var errorObject = {type: type, message: message};
@@ -60,7 +78,9 @@ module.exports = Model.extend({
       var count = 0;
       includeFn = includeFn || function(){ return true };
       for (prop in this.errorsBag) {
-         count += ( includeFn(prop) ? this.errorsBag[prop].length : 0) ;
+         _.forEach(this.errorsBag[prop], function(item) {
+            count += ( includeFn(prop, item.type) ? 1 : 0) ;
+         });
       }
       return count === 0;
    }

@@ -26,6 +26,10 @@ module.exports = PageView.extend({
             deps: ['model.errorsBag.name'],
             fn: function() { return this.model.getErrMessagesArray('name').join(', '); }
        },
+       emailMessages: {
+            deps: ['model.errorsBag.email'],
+            fn: function() { return this.model.getErrMessagesArray('email').join(', '); }
+       },
     },
 
     // model-to-DOM 1-way bindings
@@ -45,6 +49,7 @@ module.exports = PageView.extend({
        'model.pin':        [{type: 'value', hook: 'pin'}],
        'nameMessages':     [{type: 'text', hook: 'name-error'}],
        'genderMessages':   [{type: 'text', hook: 'gender-error'}],
+       'emailMessages':    [{type: 'text', hook: 'email-error'}],
        'modelMessages':    [{type: 'text', hook: 'model-error'}],
     }),
 
@@ -61,11 +66,14 @@ module.exports = PageView.extend({
        e.preventDefault();
        console.log('State n='+this.model.name+ ' g=' + this.model.gender+' c='+this.model.country);
 
-       this.model.validateModel();   // Validates all model props and updates errorsBag accordingly
-
-       if (this.model.isClientModelValid()) {     // Ignore server error messages as server validations will be performed in save
-          //this.model.save();
-       }
+       this.model.register({
+          success: function(model, response) {  
+             if (model.id) { app.trigger('register', response); };
+          }, 
+          error: function() {
+             console.log('backend error');
+          }
+       });
     },
 });
 

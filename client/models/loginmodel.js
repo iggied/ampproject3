@@ -3,14 +3,12 @@
 // loginOptions attached to the model is used to configure the model dynamic behavior like validations
 // errorsBag prop is automatically defined from the BaseModel superclass. It stores all error messages from validations.
 var BaseModel = require('./basemodel');
+var _ = require('lodash');
 
 module.exports = BaseModel.extend({
-   url: '/api/user',
+   urlRoot: function(action){ return this.loginOptions.urlRoot + (action ? '/'+action : ''); },
 
-   initialize: function(opts) {
-      this.loginOptions = opts.loginOptions;
-      this.getUser = opts.getUser;
-   },
+   url: function(){ return this.urlRoot()  }, 
 
    // names should match the input hooks to enable input-to-model binding
    props: {       
@@ -20,7 +18,7 @@ module.exports = BaseModel.extend({
    },
 
    session: {
-      loginOptions: ['object', false, function(){return {}}]      // configurations and settings object
+      loginOptions: ['object', false, function(){return {}}],      // configurations and settings object
    },
 
    //This method is called automatically on change event from superclass and also manually for all props 
@@ -49,11 +47,22 @@ module.exports = BaseModel.extend({
       return this.isModelValid( function(propName){ return propName !== 'model' } ) ;    // ignoring model errors as it is set only on server in validateModel
    },
 
+   login: function(opts) {
+      this.validateModel();   // Validates all model props and updates errorsBag accordingly
+      if (this.isClientModelValid()) {     // Ignore server error messages as server validations will be performed in save below
+         if (!opts.url) { 
+            opts.url = this.urlRoot('login'); };
+         this.save(null, opts);
+      };
+   },
+
    // server only method  // assuming getUser will be set to a function in the calling script 
-   fetchModel: function() {     
-      var found = this.getUser(this.userId, this.password);  // Function injected while creating instance
-      if (found) { this.token = found.token; } else { this.unset('token'); }
+   fetchUser: function(users) {     
+      var found = _.findWhere(users, {userId: this.userId, password: this.password});
+      if (found) { this.set(found); } else { this.unset('token'); }
+      this.validateModel();  
       return found ;
    },
+
 });
 

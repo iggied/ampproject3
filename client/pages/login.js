@@ -69,13 +69,14 @@ module.exports = PageView.extend({
     handleLogin: function(e) {
        e.preventDefault();
        console.log('State u='+this.model.userId + ' p=' + this.model.password +' r='+this.rememberMe);
-
-       this.model.validateModel();   // Validates all model props and updates errorsBag accordingly
-
-       if (this.model.isClientModelValid()) {     // Ignore server error messages as server validations will be performed in save
-          this.model.save({}, {success: function(model, response){ app.trigger('login', response) } });
-       };
+       this.model.login({
+          success: function(model, response) {  
+             if (model.token) { app.trigger('login', response); };
+          }, 
+          error: function() {
+             console.log('backend error');
+          }
+       });
     },
-
     
 });

@@ -5,10 +5,23 @@ var requiredCheck = function(name, value) {
                     };
 
 module.exports = {
-        nameRequired:        function(value, model) {
-                                return [requiredCheck('Name', value)]
-                             },
+        urlRoot: '/api/user',
 
+        nameRequired:   function(value, model) { return [requiredCheck('Name', value)] },
+        countryIsValid: function(value, model) {
+                                 
+                        },
+        emailReqdCheck:  function(value, model) { return [requiredCheck('Email', value)] },
+
+        emailUniqCheck: function(value, model, propName) {
+                           var sign = propName+Date.now();
+                           model.checkDupEmail(value, function(resp){ 
+console.log('callback', resp);
+                                 model.asyncCheckResponse( {propName: propName, validity: resp , type: 'uniqeemail', message: 'Email is already registered', sign: sign} ); 
+                                                      }
+                                              );
+                           return sign;
+                        },
         nameLabel:    "Name",
         genderLabel:  "Gender",
         emailLabel:   "Email",

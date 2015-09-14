@@ -10,6 +10,7 @@
     "ampersand-model": "^5.0.3",
     "ampersand-rest-collection": "^4.0.0",
     "ampersand-router": "^3.0.1",
+    "ampersand-sync": "^4.0.2",
     "ampersand-view": "^7.0.1",
     "ampersand-view-switcher": "^2.0.0",
     "andlog": "^1.0.0",
@@ -23,6 +24,7 @@
     "local-links": "^1.2.0",
     "lodash": "^3.6.0",
     "moonboots_hapi": "^4.0.0",
+    "request": "^2.61.0",
     "stylizer": "^2.1.0",
     "templatizer": "^1.0.0"
   },

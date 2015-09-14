@@ -2,6 +2,7 @@
 var equalIfFilled = function(value1, value2) { return ! (value1 == '' || value2 == '' || value1 != value2) };
 
 module.exports = {
+        urlRoot: '/api/user', 
         userIdRequired:      function(value, model) {
                                 return [{validity: (value.length > 0), type: 'required', message: 'User Id is required'}]
                              },

@@ -1,6 +1,8 @@
 var _ = require('lodash');
 var LoginModel = require('./client/models/loginmodel');
 var loginOptions = require('./client/config/loginoptions');
+var RegisterModel = require('./client/models/registermodel');
+var registerOpts = require('./client/config/registerOpts');
 
 var people = [
     {
@@ -59,37 +61,60 @@ function get(id) {
 }
 
 
-function getUser(userId, password) {
-    return _.findWhere(users, {userId: userId, password: password});
-}
-
 exports.register = function (server, options, next) {
     server.route({
-        method: 'POST',
-        path: '/api/user',
+        method: ['POST', 'PUT'],
+        path: '/api/user/{action}',
         handler: function (request, reply) {
-            var user = request.payload;
+console.log(request.payload);
 
-            console.log(request.payload);
+            switch (request.params.action) {
+               case 'login': {
 
-            //loginOptions.getToken = getToken;   // I WANT TO CALL A FUNCTION DEFINED HERE FROM A MODEL METHOD ??
+                  var user = request.payload;
+                  user.loginOptions = loginOptions;
+                  var loginModel = new LoginModel(user);
+                  if (loginModel.fetchUser(users)) {
+                     loginModel.password = 'V@l1dated>';		// We are not sending the real password back on wire
+                  };
 
-            var loginModel = new LoginModel({loginOptions: loginOptions, getUser: getUser});
-            loginModel.set( user );
-            var found = loginModel.fetchModel();
-            
-            loginModel.validateModel(users);
+                  reply(loginModel).code(loginModel ? 200 : 404).state('userid', loginModel.userId);
+                  break;
+               }
 
-            reply(loginModel).code(loginModel? 200 : 404).state('userid', found.userId);
+               case 'register': {
+                  var profile = request.payload;
+                  profile.registerOpts = registerOpts;
+                  var registerModel = new RegisterModel(profile);
+
+                  registerModel.validateModel({wait: 10});
+
+                  setTimeout( function() {
+                     if (registerModel.isModelValid()) {
+                        registerModel.id = '11111';
+                     } else { registerModel.id = ''; }
+
+                     reply(registerModel).code(registerModel ? 200 : 404);
+                  }, 100);
+                  break;
+               }
+            };
         }
     });
 
     server.route({
        method: 'GET',
-       path: '/api/user/{userId}/{password}',
+       path: '/api/user/{action}',
        handler: function(request, reply) {
-          var found = getUser( request.params.userId, request.params.password );
-          reply(found).code(found ? 200 : 404);
+console.log(request.params, request.query);
+          var found = request.query.email == 'ignatius'; 
+/*
+var stop = new Date().getTime();
+  while(new Date().getTime() < stop + 3000) {
+     ;
+};
+*/
+          reply(found).code(200);
        }
     });
 
