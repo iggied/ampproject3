@@ -23,7 +23,9 @@
     "hapi": "^8.0.0",
     "local-links": "^1.2.0",
     "lodash": "^3.6.0",
+    "lodash.isobject": "^3.0.2",
     "moonboots_hapi": "^4.0.0",
+    "q": "^1.4.1",
     "request": "^2.61.0",
     "stylizer": "^2.1.0",
     "templatizer": "^1.0.0"

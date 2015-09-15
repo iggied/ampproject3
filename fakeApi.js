@@ -3,6 +3,7 @@ var LoginModel = require('./client/models/loginmodel');
 var loginOptions = require('./client/config/loginoptions');
 var RegisterModel = require('./client/models/registermodel');
 var registerOpts = require('./client/config/registerOpts');
+var Q = require('q');
 
 var people = [
     {
@@ -87,15 +88,20 @@ console.log(request.payload);
                   profile.registerOpts = registerOpts;
                   var registerModel = new RegisterModel(profile);
 
-                  registerModel.validateModel({wait: 10});
+                  registerModel.validateModel();
 
-                  setTimeout( function() {
+                  registerModel.asyncChecksCompleted().then(function() {
+//setTimeout( function() {
                      if (registerModel.isModelValid()) {
                         registerModel.id = '11111';
                      } else { registerModel.id = ''; }
 
-                     reply(registerModel).code(registerModel ? 200 : 404);
-                  }, 100);
+                     reply(registerModel).code(200);
+//}, 20);
+                    }, function(err){
+                       reply(err).code(404);
+                    }
+                  );
                   break;
                }
             };
@@ -108,12 +114,12 @@ console.log(request.payload);
        handler: function(request, reply) {
 console.log(request.params, request.query);
           var found = request.query.email == 'ignatius'; 
-/*
+
 var stop = new Date().getTime();
-  while(new Date().getTime() < stop + 3000) {
+  while(new Date().getTime() < stop + 100) {
      ;
 };
-*/
+
           reply(found).code(200);
        }
     });

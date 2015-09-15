@@ -1,5 +1,7 @@
 var Model = require('ampersand-model');
 var _ = require('lodash');
+var isObject = require('lodash.isobject');
+var Q = require('q');
 
 module.exports = Model.extend({
 
@@ -11,20 +13,68 @@ module.exports = Model.extend({
       asyncPendingCalls: ['array', false, function(){ return[] }]
    },
 
-   validate: function(e, opts) {        //This method is automatically called while setting the value of props with validate: true & propName 
+   set: function(key, value, options) {
+      var attrs;
+
+      // Handle both `"key", value` and `{key: value}` -style arguments.
+      if (isObject(key) || key === null) {
+          return Model.prototype.set.apply(this, [key, value, options]);
+      } else {
+         options = options || {};
+         if (this.validationExists(key)) {
+            // Doing this hack to automatically validate single attribute
+            options['validate'] = true;
+            options['propName'] = key; 
+         };
+
+         return Model.prototype.set.apply(this, [key, value, options]);
+      }
+   },
+
+   //This method is automatically called while setting the value of props with validate: true & propName   
+   validate: function(attrs, opts) {        
       var oldVal = this[opts.propName];
-      var newVal = e[opts.propName];
-      this.validateProp(opts.propName, newVal, oldVal );       //This method has to be defined in the subclass
+      var newVal = attrs[opts.propName];
+      //validateProp method is defined in the subclass
+      this.validateProp(opts.propName, newVal, oldVal );       
       return false;		// false means no errors / only then will the value be set on the model
    },
 
    validateModel: function() {
        for (propName in this.getAttributes({props: true})) {
-          this.validateProp(propName, this[propName], this[propName]);	// subclass has to implement this method
+          if (this.validationExists(propName)) { 
+             this.validateProp(propName, this[propName], this[propName], false);
+          };
        }
    },
 
-   // Called from subclass to iterate over an array of functions which return an array/object of error messages.
+   //This method is called automatically on set>>change event and also manually for all props 
+   validateProp: function(propName, newValue, oldValue, inspectOnly) {
+console.log('validateProp', propName, newValue, oldValue, inspectOnly);
+      var checks, checksArray, asyncChecksArray, checkExists = false ;
+      if (this.validation && typeof this.validation[propName] == 'function' ) {
+         checks = this.validation[propName](this);
+         checksArray = checks.syncCheck;
+         asyncChecksArray = checks.asyncCheck;
+      };
+
+      if (checksArray) {
+         checkExists = true;
+         inspectOnly || this.executeChecks(propName, checksArray, newValue, oldValue );   // method defined in superclass
+      };
+
+      if (asyncChecksArray) {
+         checkExists = true;
+         inspectOnly || this.executeAsyncChecks(propName, asyncChecksArray, newValue, oldValue );   // method defined in superclass
+      };
+      return checkExists;
+   },
+
+   validationExists: function(propName) {
+      return this.validateProp(propName,null,null,true);
+   },
+
+   //Called from subclass to iterate over an array of functions which return an array/object of error messages.
    executeChecks: function(propName, checksArray, newValue, oldValue) {
       var result ;
 
@@ -38,7 +88,7 @@ module.exports = Model.extend({
       }, this);
    },
 
-   // Called from subclass to iterate over an array of functions which return an array/object of error messages.
+   //Called from subclass to iterate over an array of functions which return an array/object of error messages.
    executeAsyncChecks: function(propName, checksArray, newValue, oldValue) {
       var sign;
       _.forEach(checksArray, function(checkFn) {
@@ -49,8 +99,24 @@ module.exports = Model.extend({
 
    asyncCheckResponse: function(inResult) {
       this.updateErrorBag(inResult.propName, inResult.type, inResult.message, inResult.validity);
-      this.asyncPendingCalls.pop();	//THIS SHOULD NOT BE POP, INSTEAD FIND AND DELETE THE ELEMENT
+      _.remove(this.asyncPendingCalls, function(v) { return v = inResult.sign});
    }, 
+
+   asyncChecksCompleted: function() {
+      var deferred = Q.defer();
+      var self = this;
+      var execCount = 0;
+      var fn = function() { 
+         if (self.asyncPendingCalls.length == 0) { 
+            deferred.resolve(); 
+         } else {
+	    if (execCount++ < 5){ setTimeout(fn, 20); } else { deferred.reject('timeout') };
+         }
+      };
+      fn();
+
+      return deferred.promise
+   },
 
    updateErrorBag: function( propName, type, message, valid ) {
       var errorObject = {type: type, message: message};

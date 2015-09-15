@@ -21,6 +21,12 @@ module.exports = BaseModel.extend({
       loginOptions: ['object', false, function(){return {}}],      // configurations and settings object
    },
 
+   validation: {
+      userId: function(self){ return {syncCheck: self.loginOptions.userIdChecks()}; },
+      password: function(self) { return {syncCheck: [self.loginOptions.validatePassword]}; },   
+   },
+
+/*
    //This method is called automatically on change event from superclass and also manually for all props 
    validateProp: function(propName, newValue, oldValue) {
       var checksArray ;
@@ -35,6 +41,7 @@ module.exports = BaseModel.extend({
 
       return false;
    },
+*/
 
    validateModel: function() {
       BaseModel.prototype.validateModel.apply(this);

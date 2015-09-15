@@ -19,11 +19,14 @@ module.exports = View.extend({
 
    handleInputChange: function(e) {
       var propName = e.target.getAttribute('data-hook');
-      var propValue = {}; propValue[propName] = this.getInputValue(e.target);
+      //var propValue = {}; propValue[propName] = this.getInputValue(e.target);
+      var propValue = this.getInputValue(e.target);
       if (propName in this) {  
-         this.set( propValue, {validate: true, propName: propName} );
+         //this.set( propValue, {validate: true, propName: propName} );
+         this[propName] = propValue;
       } else {
-         this.model.set( propValue, {validate: true, propName: propName} );
+         //this.model.set( propValue, {validate: true, propName: propName} );
+         this.model[propName] = propValue;    // Assuming model is set as the model
       }
    },
 

@@ -6,9 +6,13 @@ var BaseModel = require('./basemodel');
 var sync = require('ampersand-sync');
 
 module.exports = BaseModel.extend({
-   urlRoot: function(){ return ((typeof window == 'undefined')?'http://localhost:3000':'') + this.registerOpts.urlRoot; },
+   urlRoot: function() { 
+      return ((typeof window == 'undefined')?'http://localhost:3000':'') + this.registerOpts.urlRoot; 
+   },
 
-   url: function(action){ return this.urlRoot() + (action ? '/'+action : '') }, 
+   url: function(action) { 
+      return this.urlRoot() + (action ? '/'+action : '') 
+   }, 
 
    idAttribute: 'id',
 
@@ -28,56 +32,33 @@ module.exports = BaseModel.extend({
       countryModel: ['object', false, function(){return {}}],
    },
 
-   //This method is called automatically on change event from superclass and also manually for all props 
-   validateProp: function(propName, newValue, oldValue) {
-      var checksArray ;
-      var asyncChecksArray ;
-      switch (propName) {
-         case 'name':    { checksArray = [this.registerOpts.nameRequired]; break; }    
-         case 'gender':  { checksArray = []; break; }  
-         case 'email':   { checksArray = [this.registerOpts.emailReqdCheck];
-                           asyncChecksArray = [this.registerOpts.emailUniqCheck]; 
-                           break; 
-                         } 
-         case 'mobile':  { checksArray = []; break; }
-         case 'country': { checksArray = []; break; } 
-         case 'pin':     { checksArray = []; break; } 
-      };
-
-      if (checksArray) {
-         this.executeChecks(propName, checksArray, newValue, oldValue );   // method defined in superclass
-      }
-
-      if (asyncChecksArray) {
-         this.executeAsyncChecks(propName, asyncChecksArray, newValue, oldValue );   // method defined in superclass
-      }
-      return false;
+   validation: {
+      name: function(self){ return {syncCheck: [self.registerOpts.nameRequired]} },
+      gender: function(self){ return {} },
+      email: function(self){ return {syncCheck: [self.registerOpts.emailReqdCheck], asyncCheck: [self.registerOpts.emailUniqCheck]} },
    },
 
-   validateModel: function(opts) {
-      BaseModel.prototype.validateModel.apply(this, [opts]);
+   validateModel: function() {
+      BaseModel.prototype.validateModel.apply(this);
       if (typeof window == 'undefined') {      // server only block
          //this.updateErrorBag('model', 'auth', 'invalid user', !!this.token);
       }
    },
 
    isClientModelValid: function() {
-      return this.isModelValid( function(propName, type){ return type != 'uniqeemail' } ) ;    // ignoring model errors as it is set only on server in validateModel
+      // ignoring server based errors as it is checked and set on the server in validateModel
+      // Use this to bypass server errors as those will be handled on the server
+      return this.isModelValid( function(propName, type){ return type != 'uniqeemail' } ) ;    
    },
 
-   checkDupEmail: function(value, callback) {
+   checkDupEmail: function(inputValue, callback) {
       var options = {
          url: this.url('checkemail'), 
-         data: {email: value}, 
-         success: function(resp){ console.log('success', resp); callback(resp); }, 
+         data: {email: inputValue}, 
+         success: function(resp){ callback(resp); }, 
          error: function(resp, s, msg){ console.log(resp, s, msg); } 
       };
-
-      var rawRequest = sync('read', null, options);
-   },
-
-   validateCountry: function() {
-
+      sync('read', null, options);
    },
 
    register: function(opts) {

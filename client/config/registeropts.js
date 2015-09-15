@@ -16,7 +16,6 @@ module.exports = {
         emailUniqCheck: function(value, model, propName) {
                            var sign = propName+Date.now();
                            model.checkDupEmail(value, function(resp){ 
-console.log('callback', resp);
                                  model.asyncCheckResponse( {propName: propName, validity: resp , type: 'uniqeemail', message: 'Email is already registered', sign: sign} ); 
                                                       }
                                               );
