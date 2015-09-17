@@ -2,8 +2,33 @@
 // xxxOpts and getUser function is passed while creating an instance of this model
 // xxxOpts attached to the model is used to configure the model dynamic behavior like validations
 // errorsBag prop is automatically defined from the BaseModel superclass. It stores all error messages from validations.
+var State = require('ampersand-state');
+var Collection = require('ampersand-collection');
 var BaseModel = require('./basemodel');
 var sync = require('ampersand-sync');
+var isObject = require('lodash.isobject');
+
+var Address = BaseModel.extend({
+   typeAttribute: 'addresses',   //it should be same as the name used to declare this state collection as a children
+   props: {
+      type:    ['string', false, ''],
+      line1:   ['string', false, ''],
+      line2:   ['string', false, ''],
+      city:    ['string', false, ''],
+      pin:     ['string', false, ''],
+      state:   ['string', false, ''],
+      country: ['string', false, ''],
+   },
+
+   validation: {
+      line1: function(){ console.log(this); return {syncCheck: [this.parent.registerOpts.line1Required]}; },
+      city: function(){ return {}; },
+   },
+});
+
+var AddressCollection = Collection.extend({
+   model: Address
+});
 
 module.exports = BaseModel.extend({
    urlRoot: function() { 
@@ -14,8 +39,6 @@ module.exports = BaseModel.extend({
       return this.urlRoot() + (action ? '/'+action : '') 
    }, 
 
-   idAttribute: 'id',
-
    // names should match the input hooks to enable input-to-model binding
    props: {       
       id:     ['string', false, ''],
@@ -23,8 +46,10 @@ module.exports = BaseModel.extend({
       gender: ['string', false, ''],
       email:  ['string', false, ''],
       mobile: ['string', false, ''],
-      country:['string', false, ''],
-      pin:    ['string', false, '']
+   },
+
+   children: {
+      addresses: Collection.extend({ model: Address }, {parent: this})
    },
 
    session: {
@@ -33,9 +58,13 @@ module.exports = BaseModel.extend({
    },
 
    validation: {
-      name: function(self){ return {syncCheck: [self.registerOpts.nameRequired]} },
-      gender: function(self){ return {} },
-      email: function(self){ return {syncCheck: [self.registerOpts.emailReqdCheck], asyncCheck: [self.registerOpts.emailUniqCheck]} },
+      name: function(){ return {syncCheck: [this.registerOpts.nameRequired]}; },
+      gender: function(){ return {}; },
+      email: function(){ return {syncCheck: [this.registerOpts.emailReqdCheck], asyncCheck: [this.registerOpts.emailUniqCheck]}; },
+      addresses: {
+         line1: function(){ return {}; },
+         city: function(){ return {}; },
+      },
    },
 
    validateModel: function() {
@@ -51,30 +80,25 @@ module.exports = BaseModel.extend({
       return this.isModelValid( function(propName, type){ return type != 'uniqeemail' } ) ;    
    },
 
-   checkDupEmail: function(inputValue, callback) {
+   checkDupEmail: function(inputValue, inputBag) {
+      var successFn = function(resp){ inputBag.validity = resp; this.asyncCheckResponse(inputBag); };
+      var boundFn = successFn.bind(this);
+ 
       var options = {
          url: this.url('checkemail'), 
          data: {email: inputValue}, 
-         success: function(resp){ callback(resp); }, 
+         success: boundFn,
          error: function(resp, s, msg){ console.log(resp, s, msg); } 
       };
       sync('read', null, options);
    },
 
-   register: function(opts) {
+   register: function(options) {
       this.validateModel();   // Validates all model props and updates errorsBag accordingly
       if (this.isClientModelValid()) {     // Ignore server error messages as server validations will be performed in save below
-         if (!opts.url) { opts.url = this.url('register'); };
-         this.save(null, opts);
+         options.url = this.url('register'); 
+         this.save(null, options);
       };
-   },
-
-   // server only method  // assuming getUser will be set to a function in the calling script 
-   fetchModel: function() {     
-/*      var found = this.getUser(this.userId, this.password);  // Function injected while creating instance
-      if (found) { this.token = found.token; } else { this.unset('token'); }
-      return found ;
-*/
    },
 });
 

@@ -6,9 +6,13 @@ var BaseModel = require('./basemodel');
 var _ = require('lodash');
 
 module.exports = BaseModel.extend({
-   urlRoot: function(action){ return this.loginOptions.urlRoot + (action ? '/'+action : ''); },
+   urlRoot: function() { 
+      return ((typeof window == 'undefined')?'http://localhost:3000':'') + this.loginOptions.urlRoot; 
+   },
 
-   url: function(){ return this.urlRoot()  }, 
+   url: function(action) { 
+      return this.urlRoot() + (action ? '/'+action : '') 
+   }, 
 
    // names should match the input hooks to enable input-to-model binding
    props: {       
@@ -22,26 +26,9 @@ module.exports = BaseModel.extend({
    },
 
    validation: {
-      userId: function(self){ return {syncCheck: self.loginOptions.userIdChecks()}; },
-      password: function(self) { return {syncCheck: [self.loginOptions.validatePassword]}; },   
+      userId: function() { return {syncCheck: this.loginOptions.userIdChecks()}; },
+      password: function() { return {syncCheck: [this.loginOptions.validatePassword]}; },   
    },
-
-/*
-   //This method is called automatically on change event from superclass and also manually for all props 
-   validateProp: function(propName, newValue, oldValue) {
-      var checksArray ;
-      switch (propName) {
-         case 'userId': { checksArray = this.loginOptions.userIdChecks(); break; }    // userIdChecks returns an array of validation functions
-         case 'password': { checksArray = [this.loginOptions.validatePassword]; break; }  // validatePassword is the single validation function
-      };
-
-      if (checksArray) {
-         this.executeChecks(propName, checksArray, newValue, oldValue );   // method defined in superclass
-      }
-
-      return false;
-   },
-*/
 
    validateModel: function() {
       BaseModel.prototype.validateModel.apply(this);
@@ -58,12 +45,12 @@ module.exports = BaseModel.extend({
       this.validateModel();   // Validates all model props and updates errorsBag accordingly
       if (this.isClientModelValid()) {     // Ignore server error messages as server validations will be performed in save below
          if (!opts.url) { 
-            opts.url = this.urlRoot('login'); };
+            opts.url = this.url('login'); };
          this.save(null, opts);
       };
    },
 
-   // server only method  // assuming getUser will be set to a function in the calling script 
+   // server only method  
    fetchUser: function(users) {     
       var found = _.findWhere(users, {userId: this.userId, password: this.password});
       if (found) { this.set(found); } else { this.unset('token'); }

@@ -1,6 +1,7 @@
 var Model = require('ampersand-model');
 var _ = require('lodash');
 var isObject = require('lodash.isobject');
+var assign = require('lodash.assign');
 var Q = require('q');
 
 module.exports = Model.extend({
@@ -16,19 +17,30 @@ module.exports = Model.extend({
    set: function(key, value, options) {
       var attrs;
 
+      // Doing this hack to automatically validate validified attributes
+
       // Handle both `"key", value` and `{key: value}` -style arguments.
       if (isObject(key) || key === null) {
-          return Model.prototype.set.apply(this, [key, value, options]);
-      } else {
-         options = options || {};
-         if (this.validationExists(key)) {
-            // Doing this hack to automatically validate single attribute
-            options['validate'] = true;
-            options['propName'] = key; 
+         attrs = key;
+         options = value;
+
+         for (attr in attrs) {
+            if (this.validationExists(attr)) {
+	       Model.prototype.set.apply(this, [ attr, attrs[attr], assign({}, options, {validate: true, propName: attr}) ]);
+            } else {
+	       Model.prototype.set.apply(this, [ attr, attrs[attr], options ]);
+            };
          };
 
-         return Model.prototype.set.apply(this, [key, value, options]);
+      } else {
+         if (this.validationExists(key)) {
+            Model.prototype.set.apply(this, [ key, value, assign({}, options, {validate: true, propName: key}) ]);
+         } else {
+            Model.prototype.set.apply(this, [ key, value, options ]);
+         };
       }
+
+      return this;
    },
 
    //This method is automatically called while setting the value of props with validate: true & propName   
@@ -51,23 +63,23 @@ module.exports = Model.extend({
    //This method is called automatically on set>>change event and also manually for all props 
    validateProp: function(propName, newValue, oldValue, inspectOnly) {
 console.log('validateProp', propName, newValue, oldValue, inspectOnly);
-      var checks, checksArray, asyncChecksArray, checkExists = false ;
-      if (this.validation && typeof this.validation[propName] == 'function' ) {
-         checks = this.validation[propName](this);
+      var checks, checksArray, asyncChecksArray, rawFn, boundFn;
+      rawFn = this.validation[propName];
+      if (this.validation && typeof rawFn == 'function' ) {
+         boundFn = rawFn.bind(this);
+         checks = boundFn();
          checksArray = checks.syncCheck;
          asyncChecksArray = checks.asyncCheck;
       };
 
       if (checksArray) {
-         checkExists = true;
          inspectOnly || this.executeChecks(propName, checksArray, newValue, oldValue );   // method defined in superclass
       };
 
       if (asyncChecksArray) {
-         checkExists = true;
          inspectOnly || this.executeAsyncChecks(propName, asyncChecksArray, newValue, oldValue );   // method defined in superclass
       };
-      return checkExists;
+      return !!(checksArray || asyncChecksArray) ;     // true if any of these vars have value
    },
 
    validationExists: function(propName) {
@@ -90,16 +102,16 @@ console.log('validateProp', propName, newValue, oldValue, inspectOnly);
 
    //Called from subclass to iterate over an array of functions which return an array/object of error messages.
    executeAsyncChecks: function(propName, checksArray, newValue, oldValue) {
-      var sign;
+      var callKey;
       _.forEach(checksArray, function(checkFn) {
          sign = checkFn(newValue, this, propName);
-         this.asyncPendingCalls.push(sign);
+         this.asyncPendingCalls.push(callKey);
       }, this);
    },
 
    asyncCheckResponse: function(inResult) {
       this.updateErrorBag(inResult.propName, inResult.type, inResult.message, inResult.validity);
-      _.remove(this.asyncPendingCalls, function(v) { return v = inResult.sign});
+      _.remove(this.asyncPendingCalls, function(v) { return v = inResult.callKey});
    }, 
 
    asyncChecksCompleted: function() {

@@ -7,20 +7,20 @@ var requiredCheck = function(name, value) {
 module.exports = {
         urlRoot: '/api/user',
 
+        nameMinimum:    function(value, model) {
+                           return {validity: (value.length > 1),  type: 'length',   message: 'Name should be atleast 2 characters'}
+                        },
         nameRequired:   function(value, model) { return [requiredCheck('Name', value)] },
         countryIsValid: function(value, model) {
-                                 
                         },
-        emailReqdCheck:  function(value, model) { return [requiredCheck('Email', value)] },
-
+        emailReqdCheck: function(value, model) { return [requiredCheck('Email', value)] },
         emailUniqCheck: function(value, model, propName) {
-                           var sign = propName+Date.now();
-                           model.checkDupEmail(value, function(resp){ 
-                                 model.asyncCheckResponse( {propName: propName, validity: resp , type: 'uniqeemail', message: 'Email is already registered', sign: sign} ); 
-                                                      }
-                                              );
-                           return sign;
+                           var callKey = propName+Date.now();
+                           model.checkDupEmail(value, 
+                                 {propName: propName, validity: undefined, type: 'uniqeemail', message: 'Email is already registered', callKey: callKey} ); 
+                           return callKey;
                         },
+        line1Required:   function(value, model) { return [requiredCheck('Address line 1', value)] },
         nameLabel:    "Name",
         genderLabel:  "Gender",
         emailLabel:   "Email",

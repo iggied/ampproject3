@@ -3,7 +3,7 @@
 // Model validations happen automatically on DOM change event. model-to-DOM binding works automatically from the binding hash. 
 // xxxOpts attached to the model is used to configure the view.
 
- 
+var View = require('ampersand-view'); 
 var PageView = require('./baseview');
 var templates = require('../templates');
 var _ = require('lodash');
@@ -75,6 +75,21 @@ module.exports = PageView.extend({
           }
        });
     },
+
+    subviews: {
+        addressesView: {
+            selector: '[data-hook=address-container]',
+            //waitFor: 'model.addresses',
+            prepareView: function (el) {
+                return new View({
+                    el: el,
+                    collection: this.model.addresses
+                });
+            }
+        },
+    },
+
+
 });
 
 
