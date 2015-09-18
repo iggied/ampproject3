@@ -21,11 +21,18 @@ module.exports = {
                            return callKey;
                         },
         line1Required:   function(value, model) { return [requiredCheck('Address line 1', value)] },
+        genders:      [{text: '<select>', value: ''}, {text: 'Female', value: 'F'}, {text: 'Male', value: 'M'}, {text: 'Trans', value: 'T'}],
         nameLabel:    "Name",
         genderLabel:  "Gender",
         emailLabel:   "Email",
         mobileLabel:  "Mobile",
         countryLabel: "Country",
         pinLabel:     "Pin/Zip code",
-        genders: [{text: '<select>', value: ''}, {text: 'Female', value: 'F'}, {text: 'Male', value: 'M'}, {text: 'Trans', value: 'T'}]
+        line1Label:   "Address line 1",
+        line2Label:   "Address line 2",
+        cityLabel:    "City",
+        stateLabel:   "State",
+        pinLabel:     "Pin/Zip",
+        countryLabel: "Country",
+      
     }

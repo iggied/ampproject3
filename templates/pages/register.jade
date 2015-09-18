@@ -20,18 +20,46 @@ section.page.registersection
       input(type='text', data-hook='mobile', tabindex=4)
       span(data-hook='mobile-error')
 
+    div(data-hook='address-container')
+      span(style="display: none")
+        +address
+
     p
       input(type='submit', data-hook='registerbutton', value='Register', tabindex=7) 
 
     p
       span(data-hook='model-error')
 
-  div(data-hook='address-container')
+
+mixin address
+  div(style='border-style: solid') 
     p
-      span(data-hook='addresses-line1')
-      span(data-hook='addresses-line2')
-      span(data-hook='addresses-city')
-      span(data-hook='addresses-pin')
-      span(data-hook='addresses-state')
-      span(data-hook='addresses-country')
-    
+      label(data-hook='line1-label')
+      input(type='text', data-hook='line1',tabindex=5)
+      span(data-hook='line1-error')
+
+    p
+      label(data-hook='line2-label')
+      input(type='text', data-hook='line2',tabindex=6)
+      span(data-hook='line2-error')
+
+    p
+      label(data-hook='city-label')
+      input(type='text', data-hook='city',tabindex=7)
+      span(data-hook='city-error')
+
+    p
+      label(data-hook='pin-label')
+      input(type='text', data-hook='pin',tabindex=8)
+      span(data-hook='pin-error')
+
+    p
+      label(data-hook='state-label')
+      input(type='text', data-hook='state',tabindex=9)
+      span(data-hook='state-error')
+
+    p
+      label(data-hook='country-label')
+      input(type='text', data-hook='country',tabindex=10)
+      span(data-hook='country-error')
+

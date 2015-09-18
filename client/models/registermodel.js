@@ -2,14 +2,11 @@
 // xxxOpts and getUser function is passed while creating an instance of this model
 // xxxOpts attached to the model is used to configure the model dynamic behavior like validations
 // errorsBag prop is automatically defined from the BaseModel superclass. It stores all error messages from validations.
-var State = require('ampersand-state');
 var Collection = require('ampersand-collection');
-var BaseModel = require('./basemodel');
 var sync = require('ampersand-sync');
-var isObject = require('lodash.isobject');
+var BaseModel = require('./basemodel');
 
-var Address = BaseModel.extend({
-   typeAttribute: 'addresses',   //it should be same as the name used to declare this state collection as a children
+var Address = BaseModel.extend({     // This can only be used as a model within a collection, since it uses the config object from the collection parent
    props: {
       type:    ['string', false, ''],
       line1:   ['string', false, ''],
@@ -21,13 +18,9 @@ var Address = BaseModel.extend({
    },
 
    validation: {
-      line1: function(){ console.log(this); return {syncCheck: [this.parent.registerOpts.line1Required]}; },
+      line1: function(){ return {syncCheck: [this.collection.parent.registerOpts.line1Required]}; },
       city: function(){ return {}; },
    },
-});
-
-var AddressCollection = Collection.extend({
-   model: Address
 });
 
 module.exports = BaseModel.extend({
@@ -49,7 +42,7 @@ module.exports = BaseModel.extend({
    },
 
    children: {
-      addresses: Collection.extend({ model: Address }, {parent: this})
+      addresses: Collection.extend({ model: Address })
    },
 
    session: {
@@ -58,20 +51,9 @@ module.exports = BaseModel.extend({
    },
 
    validation: {
-      name: function(){ return {syncCheck: [this.registerOpts.nameRequired]}; },
+      name: function(){console.log('nvali', this); return {syncCheck: [this.registerOpts.nameRequired]}; },
       gender: function(){ return {}; },
       email: function(){ return {syncCheck: [this.registerOpts.emailReqdCheck], asyncCheck: [this.registerOpts.emailUniqCheck]}; },
-      addresses: {
-         line1: function(){ return {}; },
-         city: function(){ return {}; },
-      },
-   },
-
-   validateModel: function() {
-      BaseModel.prototype.validateModel.apply(this);
-      if (typeof window == 'undefined') {      // server only block
-         //this.updateErrorBag('model', 'auth', 'invalid user', !!this.token);
-      }
    },
 
    isClientModelValid: function() {

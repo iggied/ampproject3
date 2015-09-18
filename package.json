@@ -4,6 +4,7 @@
   "author": "Ignatius",
   "dependencies": {
     "ampersand-app": "^1.0.0",
+    "ampersand-collection-view": "^1.4.0",
     "ampersand-dom": "^1.2.1",
     "ampersand-form-view": "^3.1.1",
     "ampersand-input-view": "^4.0.5",
@@ -11,7 +12,7 @@
     "ampersand-rest-collection": "^4.0.0",
     "ampersand-router": "^3.0.1",
     "ampersand-sync": "^4.0.2",
-    "ampersand-view": "^7.0.1",
+    "ampersand-view": "^8.0.1",
     "ampersand-view-switcher": "^2.0.0",
     "andlog": "^1.0.0",
     "async": "^0.9.0",

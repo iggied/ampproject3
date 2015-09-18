@@ -27,6 +27,7 @@ server.ext('onPreResponse', function(request, reply) {
 });
 
 // require moonboots_hapi plugin
+console.log('registering stuff in hapi server');
 server.register([
     {
         register: MoonBootsHapi.register,

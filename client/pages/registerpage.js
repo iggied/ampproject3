@@ -3,10 +3,40 @@
 // Model validations happen automatically on DOM change event. model-to-DOM binding works automatically from the binding hash. 
 // xxxOpts attached to the model is used to configure the view.
 
-var View = require('ampersand-view'); 
+var View = require('ampersand-collection-view'); 
 var PageView = require('./baseview');
 var templates = require('../templates');
 var _ = require('lodash');
+
+
+//AddressView = require('ampersand-view').extend({
+AddressView = PageView.extend({
+   template: templates.pages.register.address,
+
+    derived: {
+       line1Messages: {
+            deps: ['model.errorsBag.line1'],
+            fn: function() { return this.model.getErrMessagesArray('line1').join(', '); }
+       },
+    },
+
+   bindings: {
+      'model.type':    [{type: 'value', hook: 'type'}],
+      'model.line1':   [{type: 'value', hook: 'line1'}],
+      'model.line2':   [{type: 'value', hook: 'line2'}],
+      'model.city':    [{type: 'value', hook: 'city'}],
+      'model.state':   [{type: 'value', hook: 'state'}],
+      'model.pin':     [{type: 'value', hook: 'pin'}],
+      'model.country': [{type: 'value', hook: 'country'}],
+      'model.collection.parent.registerOpts.line1Label'  : [{type: 'text', hook: 'line1-label'}],
+      'model.collection.parent.registerOpts.line2Label'  : [{type: 'text', hook: 'line2-label'}],
+      'model.collection.parent.registerOpts.cityLabel'   : [{type: 'text', hook: 'city-label'}],
+      'model.collection.parent.registerOpts.countryLabel': [{type: 'text', hook: 'country-label'}],
+      'model.collection.parent.registerOpts.pinLabel'    : [{type: 'text', hook: 'pin-label'}],
+      'model.collection.parent.registerOpts.stateLabel'  : [{type: 'text', hook: 'state-label'}],
+      'line1Messages': [{type: 'text', hook: 'line1-error'}],
+   },
+});
 
 module.exports = PageView.extend({
     pageTitle: 'Registration',
@@ -38,15 +68,11 @@ module.exports = PageView.extend({
        'model.registerOpts.genderLabel':  [{type: 'text', hook: 'gender-label'}],
        'model.registerOpts.emailLabel':   [{type: 'text', hook: 'email-label'}],
        'model.registerOpts.mobileLabel':  [{type: 'text', hook: 'mobile-label'}],
-       'model.registerOpts.countryLabel': [{type: 'text', hook: 'country-label'}],
-       'model.registerOpts.pinLabel':     [{type: 'text', hook: 'pin-label'}],
        'model.name':       [{type: 'value', hook: 'name'}],
        'model.registerOpts.genders':      [{type: PageView.prototype.selectBinding, hook: 'gender'}],
        'model.gender':     [{type: 'value', hook: 'gender'}],
        'model.email':      [{type: 'value', hook: 'email'}],
        'model.mobile':     [{type: 'value', hook: 'mobile'}],
-       'model.country':    [{type: 'value', hook: 'country'}],
-       'model.pin':        [{type: 'value', hook: 'pin'}],
        'nameMessages':     [{type: 'text', hook: 'name-error'}],
        'genderMessages':   [{type: 'text', hook: 'gender-error'}],
        'emailMessages':    [{type: 'text', hook: 'email-error'}],
@@ -59,6 +85,9 @@ module.exports = PageView.extend({
 
     render: function() {
        this.renderWithTemplate(this);
+
+//       this.renderCollection( this.model.addresses, AddressView, this.queryByHook('address-container'));
+
        return this;
     },
 
@@ -80,10 +109,12 @@ module.exports = PageView.extend({
         addressesView: {
             selector: '[data-hook=address-container]',
             //waitFor: 'model.addresses',
-            prepareView: function (el) {
+            prepareView: function(el) {
+console.log(el);
                 return new View({
                     el: el,
-                    collection: this.model.addresses
+                    collection: this.model.addresses,
+                    view: AddressView
                 });
             }
         },

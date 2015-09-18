@@ -72,8 +72,21 @@
     };
 
     // pages/register.jade compiled template
-    templatizer["pages"]["register"] = function tmpl_pages_register() {
-        return '<section class="page registersection"><h1>Registration</h1><form><p><label data-hook="name-label"></label><input type="text" data-hook="name" tabindex="1" autofocus="autofocus"/><span data-hook="name-error"></span></p><p><label data-hook="gender-label"></label><select data-hook="gender" tabindex="2"></select></p><p><label data-hook="email-label"></label><input type="text" data-hook="email" tabindex="3"/><span data-hook="email-error"></span></p><p><label data-hook="mobile-label"></label><input type="text" data-hook="mobile" tabindex="4"/><span data-hook="mobile-error"></span></p><p><input type="submit" data-hook="registerbutton" value="Register" tabindex="7"/></p><p><span data-hook="model-error"></span></p></form><div data-hook="address-container"><p><span data-hook="addresses-line1"></span><span data-hook="addresses-line2"></span><span data-hook="addresses-city"></span><span data-hook="addresses-pin"></span><span data-hook="addresses-state"></span><span data-hook="addresses-country"></span></p></div></section>';
+    templatizer["pages"]["register"] = function tmpl_pages_register(locals) {
+        var buf = [];
+        var jade_mixins = {};
+        var jade_interp;
+        buf.push('<section class="page registersection"><h1>Registration</h1><form><p><label data-hook="name-label"></label><input type="text" data-hook="name" tabindex="1" autofocus="autofocus"/><span data-hook="name-error"></span></p><p><label data-hook="gender-label"></label><select data-hook="gender" tabindex="2"></select></p><p><label data-hook="email-label"></label><input type="text" data-hook="email" tabindex="3"/><span data-hook="email-error"></span></p><p><label data-hook="mobile-label"></label><input type="text" data-hook="mobile" tabindex="4"/><span data-hook="mobile-error"></span></p><div data-hook="address-container"><span style="display: none">');
+        buf.push(templatizer["pages"]["register"]["address"]());
+        buf.push('</span></div><p><input type="submit" data-hook="registerbutton" value="Register" tabindex="7"/></p><p><span data-hook="model-error"></span></p></form></section>');
+        return buf.join("");
+    };
+
+    // pages/register.jade:address compiled template
+    templatizer["pages"]["register"]["address"] = function tmpl_pages_register_address() {
+        var block = this && this.block, attributes = this && this.attributes || {}, buf = [];
+        buf.push('<div style="border-style: solid"> <p><label data-hook="line1-label"></label><input type="text" data-hook="line1" tabindex="5"/><span data-hook="line1-error"></span></p><p><label data-hook="line2-label"></label><input type="text" data-hook="line2" tabindex="6"/><span data-hook="line2-error"></span></p><p><label data-hook="city-label"></label><input type="text" data-hook="city" tabindex="7"/><span data-hook="city-error"></span></p><p><label data-hook="pin-label"></label><input type="text" data-hook="pin" tabindex="8"/><span data-hook="pin-error"></span></p><p><label data-hook="state-label"></label><input type="text" data-hook="state" tabindex="9"/><span data-hook="state-error"></span></p><p><label data-hook="country-label"></label><input type="text" data-hook="country" tabindex="10"/><span data-hook="country-error"></span></p></div>');
+        return buf.join("");
     };
 
     return templatizer;

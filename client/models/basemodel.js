@@ -16,24 +16,29 @@ module.exports = Model.extend({
 
    set: function(key, value, options) {
       var attrs;
-
       // Doing this hack to automatically validate validified attributes
 
       // Handle both `"key", value` and `{key: value}` -style arguments.
       if (isObject(key) || key === null) {
          attrs = key;
          options = value;
+         options = options || {};
 
-         for (attr in attrs) {
-            if (this.validationExists(attr)) {
-	       Model.prototype.set.apply(this, [ attr, attrs[attr], assign({}, options, {validate: true, propName: attr}) ]);
-            } else {
-	       Model.prototype.set.apply(this, [ attr, attrs[attr], options ]);
+         if (options.silent || options.initial) {
+            Model.prototype.set.apply(this, [ key, value, options ]);
+         } else {
+            for (attr in attrs) {
+               if (this.validationExists(attr)) {
+                  Model.prototype.set.apply(this, [ attr, attrs[attr], assign({}, options, {validate: true, propName: attr}) ]);
+               } else {
+	          Model.prototype.set.apply(this, [ attr, attrs[attr], options ]);
+               };
             };
          };
 
       } else {
-         if (this.validationExists(key)) {
+         options = options || {};
+         if (!options.silent && !options.initial && this.validationExists(key)) {
             Model.prototype.set.apply(this, [ key, value, assign({}, options, {validate: true, propName: key}) ]);
          } else {
             Model.prototype.set.apply(this, [ key, value, options ]);
@@ -57,7 +62,12 @@ module.exports = Model.extend({
           if (this.validationExists(propName)) { 
              this.validateProp(propName, this[propName], this[propName], false);
           };
-       }
+       };
+       for (child in this._children) {
+          for (i = 0; i < this[child].length; i++) {
+             this[child].at(i).validateModel();
+          };
+       };
    },
 
    //This method is called automatically on set>>change event and also manually for all props 
@@ -89,7 +99,6 @@ console.log('validateProp', propName, newValue, oldValue, inspectOnly);
    //Called from subclass to iterate over an array of functions which return an array/object of error messages.
    executeChecks: function(propName, checksArray, newValue, oldValue) {
       var result ;
-
       _.forEach(checksArray, function(checkFn) {
          result = checkFn(newValue, this);
          result = (Array.isArray(result)) ? result : [result]; 
@@ -159,7 +168,13 @@ console.log('validateProp', propName, newValue, oldValue, inspectOnly);
          _.forEach(this.errorsBag[prop], function(item) {
             count += ( includeFn(prop, item.type) ? 1 : 0) ;
          });
-      }
+      };
+      for (child in this._children) {
+         for (i = 0; i < this[child].length; i++) {
+            count += (this[child].at(i).isModelValid() ? 0 : 1) ;
+         };
+      };
+
       return count === 0;
    }
 });
